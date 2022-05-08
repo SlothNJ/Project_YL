@@ -134,6 +134,8 @@ def news_delete(id):
                                       News.user == current_user
                                       ).first()
     if news:
+        path = os.path.join('static', f'{news.id}.jpg')
+        os.remove(path)
         db_sess.delete(news)
         db_sess.commit()
     else:
