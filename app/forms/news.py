@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired
 from flask_wtf.file import FileRequired
 
 
-class NewsForm(FlaskForm):
+class NewsForm(FlaskForm):  # форма постов
     title = StringField('Заголовок', validators=[DataRequired()])
     content = TextAreaField("Содержание")
     file = FileField('Обложка', validators=[FileRequired()])

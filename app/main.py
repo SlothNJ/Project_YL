@@ -9,9 +9,11 @@ from werkzeug.utils import secure_filename
 from werkzeug.datastructures import CombinedMultiDict
 import os
 import json
+import secrets
+
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['SECRET_KEY'] = secrets.token_urlsafe(64)
 app.config['UPLOAD_FOLDER'] = 'static'
 
 login_manager = LoginManager()
@@ -24,7 +26,7 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
-@app.route("/")
+@app.route("/")  # главная страница
 def index():
     db_sess = db_session.create_session()
     if current_user.is_authenticated:
@@ -35,7 +37,7 @@ def index():
     return render_template("index.html", news=news)
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login/', methods=['GET', 'POST'])  # логин
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -50,14 +52,14 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
-@app.route('/logout')
-@login_required
+@app.route('/logout/')
+@login_required  # выход из аккаунта
 def logout():
     logout_user()
     return redirect("/")
 
 
-@app.route('/news',  methods=['GET', 'POST'])
+@app.route('/news/',  methods=['GET', 'POST'])  # добавление постов
 @login_required
 def add_news():
     form = NewsForm(CombinedMultiDict((request.files, request.form)))
@@ -83,13 +85,14 @@ def add_news():
                            form=form)
 
 
-@app.route('/news/<int:id>', methods=['GET', 'POST'])
+@app.route('/news/<int:id>/', methods=['GET', 'POST'])  # просмотр поста
 def view(id):
     db_sess = db_session.create_session()
     news = db_sess.query(News).filter(News.id == id).first()
     return render_template('view.html', news=news)
 
-@app.route('/news_edit/<int:id>', methods=['GET', 'POST'])
+
+@app.route('/news_edit/<int:id>/', methods=['GET', 'POST'])  # изменение поста
 @login_required
 def edit_news(id):
     form = NewsForm()
@@ -123,7 +126,7 @@ def edit_news(id):
                            )
 
 
-@app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
+@app.route('/news_delete/<int:id>/', methods=['GET', 'POST'])  # удаление поста
 @login_required
 def news_delete(id):
     db_sess = db_session.create_session()
@@ -138,7 +141,7 @@ def news_delete(id):
     return redirect('/')
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register/', methods=['GET', 'POST'])  # регистрация
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
